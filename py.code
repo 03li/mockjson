@@ -1,0 +1,18 @@
+import re
+
+def process_file(file_path):
+    with open(file_path, 'r') as f:
+        file_content = f.read()
+        # Use regex to extract relevant information from file content
+        bcuid_list = re.findall(r'<gwpop:bcuid=(\d+),dety=ligw;\nACCESS GATEWAY PORT DATA\n(.*?)END', file_content, re.DOTALL)
+        output = ""
+        for bcuid in bcuid_list:
+            bcuid_num = bcuid[0]
+            dev_port_list = re.findall(r'\n\s+(LIGW-\d+)\s+(ALN/\d+/\d+/\d+)', bcuid[1])
+            for dev_port in dev_port_list:
+                output += "{" + bcuid_num + "," + dev_port[0][5:] + "," + dev_port[1][4:] + "},\n"
+        return output
+
+# Example usage
+output_str = process_file('/content/12042023.log')
+print(output_str)
